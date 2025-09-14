@@ -28,21 +28,44 @@ public class ProductService : IProductService
 
 	public async Task<ProductDto> GetByIdAsync(int id)
 	{
-		throw new NotImplementedException();
+		var response = await _httpClient.GetAsync($"/products/{id}");
+
+		if (!response.IsSuccessStatusCode)
+		{
+			return new ProductDto();
+		}
+
+		var result = await response.Content.ReadFromJsonAsync<ProductDto>();
+		return result ?? new ProductDto();
 	}
 
 	public async Task AddAsync(ProductDto entity)
 	{
-		throw new NotImplementedException();
+		var response = await _httpClient.PostAsJsonAsync("/products", entity);
+
+		if (!response.IsSuccessStatusCode)
+		{
+			return;
+		}
 	}
 
 	public async Task UpdateAsync(ProductDto entity, int id)
 	{
-		throw new NotImplementedException();
+		var response = await _httpClient.PutAsJsonAsync($"/products/{id}", entity);
+
+		if (!response.IsSuccessStatusCode)
+		{
+			return;
+		}
 	}
 
 	public async Task DeleteAsync(int id)
 	{
-		throw new NotImplementedException();
+		var response = await _httpClient.DeleteAsync($"/products/{id}");
+
+		if (!response.IsSuccessStatusCode)
+		{
+			return;
+		}
 	}
 }

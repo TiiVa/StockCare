@@ -1,6 +1,7 @@
 ﻿@page "/products"
 @rendermode InteractiveServer
 @using Microsoft.AspNetCore.Components.QuickGrid;
+@using StockCare.DTOs.Enums
 @using SortDirection = Microsoft.AspNetCore.Components.QuickGrid.SortDirection
 
 
@@ -38,73 +39,173 @@
 
 </style>
 
-<div>
-	<header class="header mt-3">
-		<h1>StockCare</h1>
-		<hr />
-	</header>
+@if (ShowAllProducts)
+{
+	<div>
+		<header class="header mt-3">
+			<h1>StockCare</h1>
+			<hr />
+		</header>
 
-	<main class="main-content">
-		<div class="card mb-3">
-			<div class="card-header d-flex flex-row">
-				<h5 class="flex-fill">Produktlista</h5>
+		<main class="main-content">
+			<div class="card mb-3">
+				<div class="card-header d-flex flex-row">
+					<h5 class="flex-fill">Produktlista</h5>
 
-				<div class="btn-group" role="group" aria-label="Basic example">
-					<button @onclick="@ShowAddNewProductView" class="btn btn-primary">Lägg till</button>
-					<button type="button" class="btn btn-primary">Middle</button>
-					<button type="button" class="btn btn-primary">Right</button>
+					<div class="btn-group" role="group" aria-label="Basic example">
+						<button @onclick="@ShowAddNewProductView" class="btn btn-primary">Lägg till</button>
+					</div>
+
+					<div class="px-1">
+						<select class="form-select form-select-sm" @onchange="OnPageSizeChanged">
+							<option value="5">5</option>
+							<option value="10">10</option>
+							<option value="25">25</option>
+							<option value="50">50</option>
+						</select>
+					</div>
 				</div>
 
-				<div class="px-1">
-					<select class="form-select form-select-sm" @onchange="OnPageSizeChanged">
-						<option value="5">5</option>
-						<option value="10">10</option>
-						<option value="25">25</option>
-						<option value="50">50</option>
-					</select>
+				<div class="card-body pb-2 px-0 mb-0">
+					<QuickGrid class="table table-striped m-0"
+							   Items="@ProductDtoList.AsQueryable()"
+							   ItemKey="@(x => x.Id)"
+							   Pagination="_paginationState">
+						<PropertyColumn Title="Produkt Id"
+										Property="@(x => x.Id)"
+										Sortable="true"
+										IsDefaultSortColumn="true"
+										InitialSortDirection="SortDirection.Ascending" />
+						<PropertyColumn Title="Namn"
+										Property="@(x => x.Name)"
+										Sortable="true"
+										IsDefaultSortColumn="true" />
+						<PropertyColumn Title="Förpackningsenhet"
+										Property="@(x => x.Unit)"
+										Sortable="true"
+										IsDefaultSortColumn="true" />
+						<PropertyColumn Title="Antal på lager"
+										Property="@(x => x.Quantity)"
+										Sortable="true"
+										IsDefaultSortColumn="true" />
+						<PropertyColumn Title="Förpackningsstorlek"
+										Property="@(x => x.PackageSize)"
+										Sortable="true"
+										IsDefaultSortColumn="true" />
+						<PropertyColumn Title="Minsta antal på lager"
+										Property="@(x => x.MinStockLevel)"
+										Sortable="true"
+										IsDefaultSortColumn="true" />
+						<PropertyColumn Title="Senast uppdaterad"
+										Property="@(x => x.LastUpdated)"
+										Sortable="true"
+										IsDefaultSortColumn="true" />
+						<TemplateColumn>
+							<Dropdown>
+								<DropdownToggle Size="Size.Small" Color="Color.Primary">
+									Edit
+								</DropdownToggle>
+								<DropdownMenu>
+									<DropdownItem @onclick="async () => await ShowUpdateDetailsView(context)">Uppdatera</DropdownItem>
+									<DropdownDivider />
+									<DropdownItem @onclick="async () => await OnDelete(context)">Ta bort</DropdownItem>
+								</DropdownMenu>
+							</Dropdown>
+
+						</TemplateColumn>
+					</QuickGrid>
+
 				</div>
 			</div>
-
-			<div class="card-body pb-2 px-0 mb-0">
-				<QuickGrid class="table table-striped m-0"
-						   Items="@ProductDtoList.AsQueryable()"
-						   ItemKey="@(x => x.Id)"
-						   Pagination="_paginationState">
-					<PropertyColumn Title="Produkt Id"
-									Property="@(x => x.Id)"
-									Sortable="true"
-									IsDefaultSortColumn="true"
-									InitialSortDirection="SortDirection.Ascending" />
-					<PropertyColumn Title="Namn"
-									Property="@(x => x.Name)"
-									Sortable="true"
-									IsDefaultSortColumn="true" />
-					<PropertyColumn Title="Förpackningsenhet"
-									Property="@(x => x.Unit)"
-									Sortable="true"
-									IsDefaultSortColumn="true" />
-					<PropertyColumn Title="Antal på lager"
-									Property="@(x => x.Quantity)"
-									Sortable="true"
-									IsDefaultSortColumn="true" />
-					<PropertyColumn Title="Förpackningsstorlek"
-									Property="@(x => x.PackageSize)"
-									Sortable="true"
-									IsDefaultSortColumn="true" />
-					<PropertyColumn Title="Minsta antal på lager"
-									Property="@(x => x.MinStockLevel)"
-									Sortable="true"
-									IsDefaultSortColumn="true" />
-					<PropertyColumn Title="Senast uppdaterad"
-									Property="@(x => x.LastUpdated)"
-									Sortable="true"
-									IsDefaultSortColumn="true" />
-				</QuickGrid>
-
-			</div>
+		</main>
+		<div class="card-footer">
+			<Paginator State="_paginationState" />
 		</div>
-	</main>
-	<div class="card-footer">
-		<Paginator State="_paginationState" />
 	</div>
-</div>
+
+}
+
+@if (ShowUpdateProductForm)
+{
+	<Div Margin="Margin.IsAuto.OnX.Is5.FromTop" Width="Width.Is50">
+		<Heading Size="HeadingSize.Is2" Margin="Margin.Is3.FromBottom" TextAlignment="TextAlignment.Center">
+			Uppdatera produkt
+		</Heading>
+
+		<Card Shadow="Shadow.Default" Margin="Margin.Is5.FromBottom">
+			<CardBody>
+				<EditForm Model="ProductToUpdate" OnValidSubmit="() => UpdateProduct(ProductToUpdate.Id)">
+					<DataAnnotationsValidator />
+
+					<Div Margin="Margin.Is2.FromBottom">
+						<FieldLabel RequiredIndicator>
+							Produktnamn
+						</FieldLabel>
+						<FieldBody>
+							<InputText @bind-Value="ProductToUpdate.Name" class="form-control" />
+							<ValidationMessage For="() => ProductToUpdate.Name"></ValidationMessage>
+						</FieldBody>
+					</Div>
+
+					<Field ColumnSize="ColumnSize.IsFull.OnTablet.IsHalf.OnDesktop">
+						<FieldLabel>
+							Enhet
+						</FieldLabel>
+						<Select TValue="Unit" @bind-SelectedValue="@ProductToUpdate.Unit">
+							@foreach (var enumValue in Enum.GetValues<Unit>())
+							{
+								<SelectItem @key="enumValue" Value="@enumValue">@enumValue</SelectItem>
+							}
+						</Select>
+					</Field>
+
+					<Div Margin="Margin.Is2.FromBottom">
+						<FieldLabel>
+							Förpackningsstorlek
+						</FieldLabel>
+						<FieldBody>
+							<InputNumber @bind-Value="ProductToUpdate.PackageSize" class="form-control" />
+							<ValidationMessage For="() => ProductToUpdate.PackageSize"></ValidationMessage>
+						</FieldBody>
+					</Div>
+
+					<Div Margin="Margin.Is2.FromBottom">
+						<FieldLabel>
+							Antal på lager
+						</FieldLabel>
+						<FieldBody>
+							<InputNumber @bind-Value="ProductToUpdate.Quantity" class="form-control" />
+							<ValidationMessage For="() => ProductToUpdate.Quantity"></ValidationMessage>
+						</FieldBody>
+					</Div>
+
+					<Div Margin="Margin.Is2.FromBottom">
+						<FieldLabel>
+							Minsta lagernivå
+						</FieldLabel>
+						<FieldBody>
+							<InputNumber @bind-Value="ProductToUpdate.MinStockLevel" class="form-control" />
+							<ValidationMessage For="() => ProductToUpdate.MinStockLevel"></ValidationMessage>
+						</FieldBody>
+					</Div>
+
+					<Div Margin="Margin.Is2.FromBottom">
+						<FieldLabel>
+							Senast uppdaterad
+						</FieldLabel>
+						<FieldBody>
+							<InputDate @bind-Value="ProductToUpdate.LastUpdated" class="form-control" />
+							<ValidationMessage For="() => ProductToUpdate.LastUpdated"></ValidationMessage>
+						</FieldBody>
+					</Div>
+
+					<Div>
+						<Button Type="ButtonType.Submit" Color="Color.Primary">Uppdatera produkt</Button>
+					</Div>
+				</EditForm>
+			</CardBody>
+		</Card>
+	</Div>
+
+}
+

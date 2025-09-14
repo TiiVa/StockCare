@@ -1,4 +1,7 @@
 using StockCare.Client.Components;
+using Blazorise;
+using Blazorise.Bootstrap5;
+using Blazorise.Icons.FontAwesome;
 
 namespace StockCare.Client
 {
@@ -7,6 +10,14 @@ namespace StockCare.Client
 		public static void Main(string[] args)
 		{
 			var builder = WebApplication.CreateBuilder(args);
+
+			builder.Services
+				.AddBlazorise(options =>
+				{
+					options.Immediate = true;
+				})
+				.AddBootstrap5Providers()
+				.AddFontAwesomeIcons();
 
 			builder.Services.AddServices();
 

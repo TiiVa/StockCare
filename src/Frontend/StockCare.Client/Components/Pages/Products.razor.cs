@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Components.QuickGrid;
 using StockCare.Client.ServiceInterfaces;
 using StockCare.DTOs.DTOs.Product;
+using System.Text.Json.Serialization;
 
 namespace StockCare.Client.Components.Pages;
 
@@ -10,14 +11,19 @@ public partial class Products : ComponentBase
 	[Inject] private IProductService ProductService { get; set; }
 	[Inject] private NavigationManager NavigationManager { get; set; }
 	private List<ProductDto> ProductDtoList { get; set; } = [];
-	private ProductDto ProductDto { get; set; } = new();
+	private ProductDto ProductToUpdate { get; set; } = new();
 	private readonly PaginationState _paginationState = new PaginationState { ItemsPerPage = 5 };
+	private bool ShowUpdateProductForm { get; set; }
+	private bool ShowAllProducts { get; set; }
+
 
 	protected override async Task OnInitializedAsync()
 	{
 		ProductDtoList.AddRange(await ProductService.GetAllAsync());
 
 		await base.OnInitializedAsync();
+
+		ShowAllProducts = true;
 	}
 
 	private void OnPageSizeChanged(ChangeEventArgs e)
@@ -30,7 +36,37 @@ public partial class Products : ComponentBase
 
 	private async Task ShowAddNewProductView()
 	{
-		Console.WriteLine("Button clicked!"); // Debug check
 		NavigationManager.NavigateTo("/newProduct");
+	}
+
+	private async Task ShowUpdateDetailsView(ProductDto product)
+	{
+		var productToUpdate = ProductDtoList.FirstOrDefault(p => p.Id == product.Id);
+
+		if (productToUpdate is null)
+		{
+			return;
+		}
+
+		ProductToUpdate = productToUpdate;
+
+		ShowAllProducts = false;
+		ShowUpdateProductForm = true;
+	}
+
+	private async Task OnDelete(ProductDto product)
+	{
+		await ProductService.DeleteAsync(product.Id);
+		ProductDtoList.Clear();
+		ProductDtoList.AddRange(await ProductService.GetAllAsync());
+	}
+
+	private async Task UpdateProduct(int id)
+	{
+		ProductToUpdate.Id = id;
+		await ProductService.UpdateAsync(ProductToUpdate, ProductToUpdate.Id);
+
+		ProductDtoList.Clear();
+		ProductDtoList.AddRange(await ProductService.GetAllAsync());
 	}
 }
