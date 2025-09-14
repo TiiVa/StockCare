@@ -102,4 +102,20 @@ public partial class Products : ComponentBase
 
 		}
 	}
+
+	private string GetQuantityClass(ProductDto product)
+	{
+		if (product.Quantity <= product.MinStockLevel)
+			return "text-danger fw-bold";
+
+		if (product.Quantity <= product.MinStockLevel + 10)
+			return "text-warning fw-bold";
+
+		return "";
+	}
+
+	private void NavigateToOverview()
+	{
+		NavigationManager.NavigateTo("/");
+	}
 }

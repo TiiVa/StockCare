@@ -37,13 +37,19 @@
 		background-color: transparent;
 	}
 
+	.low-stock-row {
+		background-color: #fff3cd; 
+		color: #842029;
+		font-weight: bold;
+	}
+
 </style>
 
 @if (ShowAllProducts)
 {
 	<div>
 		<header class="header mt-3">
-			<h1>StockCare</h1>
+			<h1 style="color:darkblue">StockCare</h1>
 			<hr />
 		</header>
 
@@ -69,38 +75,39 @@
 
 				<div class="card-body pb-2 px-0 mb-0">
 					<QuickGrid class="table table-striped m-0"
-							   Items="@ProductDtoList.AsQueryable()"
-							   ItemKey="@(x => x.Id)"
-							   Pagination="_paginationState">
+					           Items="@ProductDtoList.AsQueryable()"
+					           ItemKey="@(x => x.Id)"
+					           Pagination="_paginationState">
 						<PropertyColumn Title="Produkt Id"
-										Property="@(x => x.Id)"
-										Sortable="true"
-										IsDefaultSortColumn="true"
-										InitialSortDirection="SortDirection.Ascending" />
+						                Property="@(x => x.Id)"
+						                Sortable="true"
+						                IsDefaultSortColumn="true"
+						                InitialSortDirection="SortDirection.Ascending"/>
 						<PropertyColumn Title="Namn"
-										Property="@(x => x.Name)"
-										Sortable="true"
-										IsDefaultSortColumn="true" />
+						                Property="@(x => x.Name)"
+						                Sortable="true"
+						                IsDefaultSortColumn="true"/>
 						<PropertyColumn Title="Förpackningsenhet"
-										Property="@(x => x.Unit)"
-										Sortable="true"
-										IsDefaultSortColumn="true" />
-						<PropertyColumn Title="Antal på lager"
-										Property="@(x => x.Quantity)"
-										Sortable="true"
-										IsDefaultSortColumn="true" />
+						                Property="@(x => x.Unit)"
+						                Sortable="true"
+						                IsDefaultSortColumn="true"/>
+						<TemplateColumn Title="Antal på lager">
+							            <div class="@GetQuantityClass(context)">
+										@context.Quantity
+										</div>
+						</TemplateColumn>
 						<PropertyColumn Title="Förpackningsstorlek"
-										Property="@(x => x.PackageSize)"
-										Sortable="true"
-										IsDefaultSortColumn="true" />
+						                Property="@(x => x.PackageSize)"
+						                Sortable="true"
+						                IsDefaultSortColumn="true"/>
 						<PropertyColumn Title="Minsta antal på lager"
-										Property="@(x => x.MinStockLevel)"
-										Sortable="true"
-										IsDefaultSortColumn="true" />
+						                Property="@(x => x.MinStockLevel)"
+						                Sortable="true"
+						                IsDefaultSortColumn="true"/>
 						<PropertyColumn Title="Senast uppdaterad"
-										Property="@(x => x.LastUpdated)"
-										Sortable="true"
-										IsDefaultSortColumn="true" />
+						                Property="@(x => x.LastUpdated)"
+						                Sortable="true"
+						                IsDefaultSortColumn="true"/>
 						<TemplateColumn>
 							<Dropdown>
 								<DropdownToggle Size="Size.Small" Color="Color.Primary">
@@ -108,9 +115,9 @@
 								</DropdownToggle>
 								<DropdownMenu>
 									<DropdownItem @onclick="async () => await WithdrawProduct(context)">Uttag</DropdownItem>
-									<DropdownDivider />
+									<DropdownDivider/>
 									<DropdownItem @onclick="async () => await ShowUpdateDetailsView(context)">Uppdatera</DropdownItem>
-									<DropdownDivider />
+									<DropdownDivider/>
 									<DropdownItem @onclick="async () => await OnDelete(context)">Ta bort</DropdownItem>
 								</DropdownMenu>
 							</Dropdown>
@@ -205,10 +212,12 @@
 
 					<Div>
 						<Button Type="ButtonType.Submit" Color="Color.Primary">Uppdatera produkt</Button>
+						<button class="btn btn-primary" type="button" @onclick="NavigateToOverview">Tillbaka</button>
 					</Div>
 				</EditForm>
 			</CardBody>
 		</Card>
+		
 	</Div>
 
 }
@@ -253,6 +262,7 @@
 					</Div>
 					<Div>
 						<Button Type="ButtonType.Submit" Color="Color.Primary">Spara</Button>
+						<button class="btn btn-primary" type="button" @onclick="NavigateToOverview">Tillbaka</button>
 					</Div>
 				</EditForm>
 			</CardBody>

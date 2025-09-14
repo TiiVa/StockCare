@@ -8,93 +8,78 @@
 @inject NavigationManager NavigationManager
 
 <Container Margin="Margin.Is5.FromTop">
-    <Column ColumnSize="ColumnSize.IsFull">
-        <Card Border="Border.Is1.Rounded.Primary" Shadow="Shadow.Default" Class="card" Margin="Margin.IsAuto.OnX.Is5.FromTop" Padding="Padding.Is5.OnX" Width="Width.Is50">
-            <CardBody>
-                <Div>
-                    <Heading Size="HeadingSize.Is2" Margin="Margin.Is3.FromBottom">
-                        Lägg till ny produkt
-                    </Heading>
-                    <EditForm Model="NewProductDto" OnValidSubmit="AddProduct" FormName="addNewProductForm">
-                        <Field>
-                            <FieldLabel>
-                                Product Name
-                            </FieldLabel>
-                            <FieldBody>
-                                <TextEdit @bind-Text="@NewProductDto.Name" Placeholder="Produktnamn" />
-                            </FieldBody>
-                        </Field>
-                        <Fields>
-	                        <Field ColumnSize="ColumnSize.IsFull.OnTablet.IsHalf.OnDesktop">
-		                        <FieldLabel>
-			                        Enhet
-		                        </FieldLabel>
-		                        <Select TValue="Unit" @bind-SelectedValue="@NewProductDto.Unit">
-			                        @foreach (var enumValue in Enum.GetValues<Unit>())
-			                        {
-				                        <SelectItem @key="enumValue" Value="@enumValue">@enumValue</SelectItem>
-			                        }
-		                        </Select>
-	                        </Field>
-                            <Field ColumnSize="ColumnSize.IsFull.OnTablet.IsHalf.OnDesktop">
-	                            <FieldLabel>
-		                            Förpackningsstorlek
-	                            </FieldLabel>
-	                            <FieldBody>
-		                            <NumericPicker Min="0" TValue="int" @bind-Value="@NewProductDto.PackageSize" Placeholder="0" />
-	                            </FieldBody>
-                            </Field>
-                            <Field ColumnSize="ColumnSize.IsFull.OnTablet.IsHalf.OnDesktop">
-	                            <FieldLabel>
-		                            Antal på lager
-	                            </FieldLabel>
-	                            <FieldBody>
-		                            <NumericPicker Min="0" TValue="int" @bind-Value="@NewProductDto.Quantity" Placeholder="0" />
-	                            </FieldBody>
-                            </Field>
-                            <Field ColumnSize="ColumnSize.IsFull.OnTablet.IsHalf.OnDesktop">
-                                <FieldLabel>
-                                    Minimiantal på lager
-                                </FieldLabel>
-                                <FieldBody>
-                                    <NumericPicker Min="0" TValue="int" @bind-Value="@NewProductDto.MinStockLevel" Placeholder="0,00" />
-                                </FieldBody>
-                            </Field>
-                        </Fields>
-                        <Field>
-                            <button type="submit" class="btn btn-primary btn-sm">Lägg till</button>
-                        </Field>
-                    </EditForm>
-                </Div>
-            </CardBody>
-        </Card>
-    </Column>
+	<Column ColumnSize="ColumnSize.IsFull">
+		<Card Border="Border.Is1.Rounded.Primary" Shadow="Shadow.Default" Class="card" Margin="Margin.IsAuto.OnX.Is5.FromTop" Padding="Padding.Is5.OnX" Width="Width.Is50">
+			<CardBody>
+				<Div>
+					<Heading Size="HeadingSize.Is2" Margin="Margin.Is3.FromBottom">
+						Lägg till ny produkt
+					</Heading>
+					<EditForm Model="NewProductDto" OnValidSubmit="AddProduct" FormName="addNewProductForm">
+						<Field>
+							<FieldLabel>
+								Product Name
+							</FieldLabel>
+							<FieldBody>
+								<TextEdit @bind-Text="@NewProductDto.Name" Placeholder="Produktnamn" />
+							</FieldBody>
+						</Field>
+						<Fields>
+							<Field ColumnSize="ColumnSize.IsFull.OnTablet.IsHalf.OnDesktop">
+								<FieldLabel>
+									Enhet
+								</FieldLabel>
+								<Select TValue="Unit" @bind-SelectedValue="@NewProductDto.Unit">
+									@foreach (var enumValue in Enum.GetValues<Unit>())
+									{
+										<SelectItem @key="enumValue" Value="@enumValue">@enumValue</SelectItem>
+									}
+								</Select>
+							</Field>
+							<Field ColumnSize="ColumnSize.IsFull.OnTablet.IsHalf.OnDesktop">
+								<FieldLabel>
+									Förpackningsstorlek
+								</FieldLabel>
+								<FieldBody>
+									<NumericPicker Min="0" TValue="int" @bind-Value="@NewProductDto.PackageSize" Placeholder="0" />
+								</FieldBody>
+							</Field>
+							<Field ColumnSize="ColumnSize.IsFull.OnTablet.IsHalf.OnDesktop">
+								<FieldLabel>
+									Antal på lager
+								</FieldLabel>
+								<FieldBody>
+									<NumericPicker Min="0" TValue="int" @bind-Value="@NewProductDto.Quantity" Placeholder="0" />
+								</FieldBody>
+							</Field>
+							<Field ColumnSize="ColumnSize.IsFull.OnTablet.IsHalf.OnDesktop">
+								<FieldLabel>
+									Minimiantal på lager
+								</FieldLabel>
+								<FieldBody>
+									<NumericPicker Min="0" TValue="int" @bind-Value="@NewProductDto.MinStockLevel" Placeholder="0,00" />
+								</FieldBody>
+							</Field>
+						</Fields>
+						<Field>
+							<button type="submit" class="btn btn-primary btn-sm">Lägg till</button>
+							<button class="btn btn-primary btn-sm" type="button" @onclick="NavigateToOverview">Tillbaka</button>
+						</Field>
+					</EditForm>
+				</Div>
+			</CardBody>
+		</Card>
+	</Column>
+	
 </Container>
 
 
 @code {
 
 	public ProductDto NewProductDto { get; set; } = new();
-	// public Unit selectedUnit;
-
-	// [Flags]
-	// [JsonConverter(typeof(JsonStringEnumConverter))]
-	// public enum Unit
-	// {
-	// 	St = 0,
-	// 	Pack = 1,
-	// 	Låda = 2,
-	// 	Mcg = 3,
-	// 	Mg = 4,
-	// 	Gram = 5,
-	// 	Kg = 6,
-	// 	Liter = 7,
-	// 	Ml = 8
-	// }
 
 	private async Task AddProduct()
 	{
-		// await ToggleModal();
 
 		var productToAdd = new ProductDto
 		{
@@ -108,9 +93,11 @@
 
 		await ProductService.AddAsync(productToAdd);
 
-		// ModalVisible = true;
-        
+	}
 
+	private void NavigateToOverview()
+	{
+		NavigationManager.NavigateTo("/products");
 	}
 
 }
