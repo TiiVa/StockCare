@@ -52,9 +52,10 @@
 				<div class="card-header d-flex flex-row">
 					<h5 class="flex-fill">Produktlista</h5>
 
-					<div class="btn-group" role="group" aria-label="Basic example">
+					<div class="btn-group" role="group">
 						<button @onclick="@ShowAddNewProductView" class="btn btn-primary">Lägg till</button>
 					</div>
+
 
 					<div class="px-1">
 						<select class="form-select form-select-sm" @onchange="OnPageSizeChanged">
@@ -106,12 +107,15 @@
 									Edit
 								</DropdownToggle>
 								<DropdownMenu>
+									<DropdownItem @onclick="async () => await WithdrawProduct(context)">Uttag</DropdownItem>
+									<DropdownDivider />
 									<DropdownItem @onclick="async () => await ShowUpdateDetailsView(context)">Uppdatera</DropdownItem>
 									<DropdownDivider />
 									<DropdownItem @onclick="async () => await OnDelete(context)">Ta bort</DropdownItem>
 								</DropdownMenu>
 							</Dropdown>
-
+						</TemplateColumn>
+						<TemplateColumn>
 						</TemplateColumn>
 					</QuickGrid>
 
@@ -208,4 +212,60 @@
 	</Div>
 
 }
+
+@if (ShowWithdrawalForm)
+{
+	<Div Margin="Margin.IsAuto.OnX.Is5.FromTop" Width="Width.Is50">
+		<Heading Size="HeadingSize.Is2" Margin="Margin.Is3.FromBottom" TextAlignment="TextAlignment.Center">
+			Ange antal att ta ut
+		</Heading>
+
+		<Card Shadow="Shadow.Default" Margin="Margin.Is5.FromBottom">
+			<CardBody>
+				<EditForm Model="ProductToUpdate" OnValidSubmit="() => UpdateProductStock(ProductToUpdate.Id)">
+					<DataAnnotationsValidator />
+
+					<Div Margin="Margin.Is2.FromBottom">
+						<FieldLabel RequiredIndicator>
+							Produktnamn
+						</FieldLabel>
+						<FieldBody>
+							<InputText @bind-Value="ProductToUpdate.Name" class="form-control" />
+							<ValidationMessage For="() => ProductToUpdate.Name"></ValidationMessage>
+						</FieldBody>
+					</Div>
+					<Div Margin="Margin.Is2.FromBottom">
+						<FieldLabel>
+							Antal på lager
+						</FieldLabel>
+						<FieldBody>
+							<NumericPicker @bind-Value="ProductToUpdate.Quantity" class="form-control" ReadOnly />
+							<ValidationMessage For="() => ProductToUpdate.Quantity"></ValidationMessage>
+						</FieldBody>
+					</Div>
+					<Div Margin="Margin.Is2.FromBottom">
+						<FieldLabel>
+							Uttag antal
+						</FieldLabel>
+						<FieldBody>
+							<NumericPicker @bind-Value="WithdrawalQuantity" Min="0" TValue="int"></NumericPicker>
+						</FieldBody>
+					</Div>
+					<Div>
+						<Button Type="ButtonType.Submit" Color="Color.Primary">Spara</Button>
+					</Div>
+				</EditForm>
+			</CardBody>
+			@if (TooLowStockLevel)
+			{
+				<p class="text-danger fs-4 ms-5">
+					Lägsta nivå på saldot överskridet!
+				</p>
+			}
+		</Card>
+	</Div>
+
+	
+}
+
 

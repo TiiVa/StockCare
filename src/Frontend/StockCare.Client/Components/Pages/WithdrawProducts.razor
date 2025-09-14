@@ -1,0 +1,18 @@
+﻿@page "/withdrawProducts"
+@using StockCare.Client.ServiceInterfaces
+@using StockCare.DTOs.DTOs.Product
+@rendermode InteractiveServer
+@inject IProductService ProductService
+
+
+@code {
+	private ProductDto ProductDto { get; set; } = new();
+
+	protected override async Task OnInitializedAsync()
+	{
+
+
+		await base.OnInitializedAsync();
+	}
+
+}

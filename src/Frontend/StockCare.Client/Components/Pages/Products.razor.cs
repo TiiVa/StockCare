@@ -15,6 +15,9 @@ public partial class Products : ComponentBase
 	private readonly PaginationState _paginationState = new PaginationState { ItemsPerPage = 5 };
 	private bool ShowUpdateProductForm { get; set; }
 	private bool ShowAllProducts { get; set; }
+	private bool ShowWithdrawalForm { get; set; }
+	private int WithdrawalQuantity { get; set; }
+	private bool TooLowStockLevel { get; set; }
 
 
 	protected override async Task OnInitializedAsync()
@@ -68,5 +71,35 @@ public partial class Products : ComponentBase
 
 		ProductDtoList.Clear();
 		ProductDtoList.AddRange(await ProductService.GetAllAsync());
+	}
+
+
+	private async Task WithdrawProduct(ProductDto context)
+	{
+		ProductToUpdate = context;
+		ShowAllProducts = false;
+		ShowWithdrawalForm = true;
+		
+	}
+
+	private async Task UpdateProductStock(int id)
+	{
+		if ((ProductToUpdate.Quantity - WithdrawalQuantity) >= ProductToUpdate.MinStockLevel)
+		{
+			ProductToUpdate.Id = id;
+			ProductToUpdate.Quantity -= WithdrawalQuantity;
+
+			await ProductService.UpdateAsync(ProductToUpdate, ProductToUpdate.Id);
+			ProductDtoList.Clear();
+			ProductDtoList.AddRange(await ProductService.GetAllAsync());
+
+			ShowWithdrawalForm = false;
+			ShowAllProducts = true;
+		}
+		else
+		{
+			TooLowStockLevel = true;
+
+		}
 	}
 }
