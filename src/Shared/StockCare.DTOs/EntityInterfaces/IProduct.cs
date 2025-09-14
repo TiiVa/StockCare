@@ -9,5 +9,6 @@ public interface IProduct
 	public string Name { get; set; }
 	public Unit Unit { get; set; }
 	public int PackageSize { get; set; }
-	public bool IsOutOfStock { get; set; }
+	public int Quantity { get; set; }
+	public int MinStockLevel { get; set; }
 }

@@ -1,0 +1,110 @@
+﻿@page "/products"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.QuickGrid;
+@using SortDirection = Microsoft.AspNetCore.Components.QuickGrid.SortDirection
+
+
+<style>
+
+	.container {
+		display: flex;
+		flex-direction: column;
+		min-height: 100vh;
+		background-color: white;
+	}
+
+
+	.header {
+		flex: 0 1 auto;
+		text-align: center;
+		margin: 0;
+		padding: 0;
+	}
+
+		.header img {
+			align-content: center;
+			width: 100%;
+			height: 10%;
+			display: block;
+		}
+
+
+	.main-content {
+		flex: 1 0 auto;
+		padding: 20px;
+		text-align: center;
+		background-color: transparent;
+	}
+
+</style>
+
+<div>
+	<header class="header mt-3">
+		<h1>StockCare</h1>
+		<hr />
+	</header>
+
+	<main class="main-content">
+		<div class="card mb-3">
+			<div class="card-header d-flex flex-row">
+				<h5 class="flex-fill">Produktlista</h5>
+
+				<div class="btn-group" role="group" aria-label="Basic example">
+					<button @onclick="@ShowAddNewProductView" class="btn btn-primary">Lägg till</button>
+					<button type="button" class="btn btn-primary">Middle</button>
+					<button type="button" class="btn btn-primary">Right</button>
+				</div>
+
+				<div class="px-1">
+					<select class="form-select form-select-sm" @onchange="OnPageSizeChanged">
+						<option value="5">5</option>
+						<option value="10">10</option>
+						<option value="25">25</option>
+						<option value="50">50</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="card-body pb-2 px-0 mb-0">
+				<QuickGrid class="table table-striped m-0"
+						   Items="@ProductDtoList.AsQueryable()"
+						   ItemKey="@(x => x.Id)"
+						   Pagination="_paginationState">
+					<PropertyColumn Title="Produkt Id"
+									Property="@(x => x.Id)"
+									Sortable="true"
+									IsDefaultSortColumn="true"
+									InitialSortDirection="SortDirection.Ascending" />
+					<PropertyColumn Title="Namn"
+									Property="@(x => x.Name)"
+									Sortable="true"
+									IsDefaultSortColumn="true" />
+					<PropertyColumn Title="Förpackningsenhet"
+									Property="@(x => x.Unit)"
+									Sortable="true"
+									IsDefaultSortColumn="true" />
+					<PropertyColumn Title="Antal på lager"
+									Property="@(x => x.Quantity)"
+									Sortable="true"
+									IsDefaultSortColumn="true" />
+					<PropertyColumn Title="Förpackningsstorlek"
+									Property="@(x => x.PackageSize)"
+									Sortable="true"
+									IsDefaultSortColumn="true" />
+					<PropertyColumn Title="Minsta antal på lager"
+									Property="@(x => x.MinStockLevel)"
+									Sortable="true"
+									IsDefaultSortColumn="true" />
+					<PropertyColumn Title="Senast uppdaterad"
+									Property="@(x => x.LastUpdated)"
+									Sortable="true"
+									IsDefaultSortColumn="true" />
+				</QuickGrid>
+
+			</div>
+		</div>
+	</main>
+	<div class="card-footer">
+		<Paginator State="_paginationState" />
+	</div>
+</div>

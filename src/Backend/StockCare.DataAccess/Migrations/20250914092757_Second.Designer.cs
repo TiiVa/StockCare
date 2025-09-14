@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StockCare.DataAccess;
 
@@ -10,9 +11,11 @@ using StockCare.DataAccess;
 namespace StockCare.DataAccess.Migrations
 {
     [DbContext(typeof(StockCareDbContext))]
-    partial class StockCareDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250914092757_Second")]
+    partial class Second
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.20");

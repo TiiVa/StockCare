@@ -1,0 +1,18 @@
+﻿@page "/newProduct"
+@rendermode InteractiveServer
+@using StockCare.Client.ServiceInterfaces
+@inject IProductService ProductService
+@inject NavigationManager NavigationManager
+
+<h3>AddNewProduct</h3>
+
+<button class="btn btn-danger" @onclick="Test">Klick</button>
+
+@code {
+
+	private void Test()
+	{
+		NavigationManager.NavigateTo("/");
+	}
+
+}

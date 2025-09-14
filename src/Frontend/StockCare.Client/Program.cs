@@ -8,6 +8,14 @@ namespace StockCare.Client
 		{
 			var builder = WebApplication.CreateBuilder(args);
 
+			builder.Services.AddServices();
+
+
+			builder.Services.AddScoped(sp => new HttpClient
+			{
+				BaseAddress = new Uri("http://localhost:5220")
+			});
+
 			// Add services to the container.
 			builder.Services.AddRazorComponents()
 				.AddInteractiveServerComponents();

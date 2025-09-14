@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid" Version="8.0.20" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\Shared\StockCare.DTOs\StockCare.DTOs.csproj" />
     <ProjectReference Include="..\..\Shared\StockCare.SharedInterfaces\StockCare.SharedInterfaces.csproj" />
   </ItemGroup>
