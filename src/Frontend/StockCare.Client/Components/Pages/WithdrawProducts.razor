@@ -3,10 +3,65 @@
 @using StockCare.DTOs.DTOs.Product
 @rendermode InteractiveServer
 @inject IProductService ProductService
+@inject NavigationManager NavigationManager
+
+<Div Margin="Margin.IsAuto.OnX.Is5.FromTop" Width="Width.Is50">
+	<Heading Size="HeadingSize.Is2" Margin="Margin.Is3.FromBottom" TextAlignment="TextAlignment.Center">
+		Ange antal att ta ut
+	</Heading>
+
+	<Card Shadow="Shadow.Default" Margin="Margin.Is5.FromBottom">
+		<CardBody>
+			<EditForm Model="ProductToUpdate" OnValidSubmit="() => UpdateProductStock(ProductToUpdate.Id)">
+				<DataAnnotationsValidator />
+
+				<Div Margin="Margin.Is2.FromBottom">
+					<FieldLabel RequiredIndicator>
+						Produktnamn
+					</FieldLabel>
+					<FieldBody>
+						<InputText @bind-Value="ProductToUpdate.Name" class="form-control" />
+						<ValidationMessage For="() => ProductToUpdate.Name"></ValidationMessage>
+					</FieldBody>
+				</Div>
+				<Div Margin="Margin.Is2.FromBottom">
+					<FieldLabel>
+						Antal på lager
+					</FieldLabel>
+					<FieldBody>
+						<NumericPicker @bind-Value="ProductToUpdate.Quantity" class="form-control" ReadOnly />
+						<ValidationMessage For="() => ProductToUpdate.Quantity"></ValidationMessage>
+					</FieldBody>
+				</Div>
+				<Div Margin="Margin.Is2.FromBottom">
+					<FieldLabel>
+						Uttag antal
+					</FieldLabel>
+					<FieldBody>
+						<NumericPicker @bind-Value="WithdrawalQuantity" Min="0" TValue="int"></NumericPicker>
+					</FieldBody>
+				</Div>
+				<Div>
+					<Button Type="ButtonType.Submit" Color="Color.Primary">Spara</Button>
+					<button class="btn btn-primary" type="button" @onclick="NavigateToOverview">Tillbaka</button>
+				</Div>
+			</EditForm>
+		</CardBody>
+		@if (TooLowStockLevel)
+		{
+			<p class="text-danger fs-4 ms-5">
+				Lägsta nivå på saldot överskridet!
+			</p>
+		}
+	</Card>
+</Div>
 
 
 @code {
-	private ProductDto ProductDto { get; set; } = new();
+	private ProductDto ProductToUpdate { get; set; } = new();
+	private List<ProductDto> ProductDtoList { get; set; } = [];
+	private int WithdrawalQuantity { get; set; }
+	private bool TooLowStockLevel { get; set; }
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -15,4 +70,28 @@
 		await base.OnInitializedAsync();
 	}
 
+	private void NavigateToOverview()
+	{
+		NavigationManager.NavigateTo("/products");
+	}
+
+	private async Task UpdateProductStock(int id)
+	{
+		if ((ProductToUpdate.Quantity - WithdrawalQuantity) >= ProductToUpdate.MinStockLevel)
+		{
+			ProductToUpdate.Id = id;
+			ProductToUpdate.Quantity -= WithdrawalQuantity;
+
+			await ProductService.UpdateAsync(ProductToUpdate, ProductToUpdate.Id);
+			ProductDtoList.Clear();
+			ProductDtoList.AddRange(await ProductService.GetAllAsync());
+
+		
+		}
+		else
+		{
+			TooLowStockLevel = true;
+
+		}
+	}
 }
