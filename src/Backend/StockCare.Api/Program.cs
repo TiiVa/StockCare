@@ -12,6 +12,8 @@ namespace StockCare.Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
+			builder.Services.AddFastEndpoints();
+
 
 			builder.Services.AddDbContext<StockCareDbContext>(options =>
 			{
@@ -23,39 +25,7 @@ namespace StockCare.Api
 
 			var app = builder.Build();
 
-			app.MapGet("/products", async (IProductRepository repo) =>
-			{
-				var products = await repo.GetAllAsync();
-				return products;
-			});
-			app.MapGet("/products/{id}", async (IProductRepository repo, int id) =>
-			{
-				var product = await repo.GetByIdAsync(id);
-				return product;
-			});
-			app.MapPost("/products", async (IProductRepository repo, ProductDto newProduct) =>
-			{
-				await repo.AddAsync(newProduct);
-
-			});
-			app.MapPut("/products/{id}", async (IProductRepository repo, ProductDto productToUpdate, int id) =>
-			{
-				var product = await repo.GetByIdAsync(id);
-
-				product.LastUpdated = DateTime.Now;
-				product.MinStockLevel = productToUpdate.MinStockLevel;
-				product.Name = productToUpdate.Name;
-				product.PackageSize = productToUpdate.PackageSize;
-				product.Quantity = productToUpdate.Quantity;
-				product.Unit = productToUpdate.Unit;
-
-				await repo.UpdateAsync(product, id);
-			});
-
-			app.MapDelete("/products/{id}", async (IProductRepository repo, int id) =>
-			{
-				await repo.DeleteAsync(id);
-			});
+			app.UseFastEndpoints();
 
 			app.Run();
         }

@@ -22,8 +22,8 @@ public class ProductService : IProductService
 			return Enumerable.Empty<ProductDto>();
 		}
 
-		var result = await response.Content.ReadFromJsonAsync<List<ProductDto>>();
-		return result ?? Enumerable.Empty<ProductDto>();
+		var result = await response.Content.ReadFromJsonAsync<ProductDtoList>();
+		return result.Products ?? Enumerable.Empty<ProductDto>();
 	}
 
 	public async Task<ProductDto> GetByIdAsync(int id)
