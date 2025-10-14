@@ -18,6 +18,7 @@ public partial class Products : ComponentBase
 	private bool ShowWithdrawalForm { get; set; }
 	private int WithdrawalQuantity { get; set; }
 	private bool TooLowStockLevel { get; set; }
+	[Parameter] public int ProductId { get; set; }
 
 
 	protected override async Task OnInitializedAsync()
@@ -44,17 +45,10 @@ public partial class Products : ComponentBase
 
 	private async Task ShowUpdateDetailsView(ProductDto product)
 	{
-		var productToUpdate = ProductDtoList.FirstOrDefault(p => p.Id == product.Id);
+		
+		ProductId = product.Id;
 
-		if (productToUpdate is null)
-		{
-			return;
-		}
-
-		ProductToUpdate = productToUpdate;
-
-		ShowAllProducts = false;
-		ShowUpdateProductForm = true;
+		NavigationManager.NavigateTo($"/updateProduct/{ProductId}");
 	}
 
 	private async Task OnDelete(ProductDto product)
@@ -76,9 +70,8 @@ public partial class Products : ComponentBase
 
 	private async Task WithdrawProduct(ProductDto context)
 	{
-		ProductToUpdate = context;
-		ShowAllProducts = false;
-		ShowWithdrawalForm = true;
+
+		NavigationManager.NavigateTo($"/withdrawProducts/{context.Id}");
 		
 	}
 

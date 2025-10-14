@@ -1,0 +1,118 @@
+﻿@page "/updateProduct/{ProductId:int}"
+@rendermode InteractiveServer
+@inject IProductService ProductService
+@inject NavigationManager NavigationManager
+@using StockCare.Client.ServiceInterfaces
+@using StockCare.DTOs.DTOs.Product
+@using StockCare.DTOs.Enums
+
+
+<Div Margin="Margin.IsAuto.OnX.Is5.FromTop" Width="Width.Is50">
+	<Heading Size="HeadingSize.Is2" Margin="Margin.Is3.FromBottom" TextAlignment="TextAlignment.Center">
+		Uppdatera produkt
+	</Heading>
+
+	<Card Shadow="Shadow.Default" Margin="Margin.Is5.FromBottom">
+		<CardBody>
+			<EditForm Model="ProductToUpdate" OnValidSubmit="() => UpdateProduct(ProductToUpdate.Id)">
+				<DataAnnotationsValidator />
+
+				<Div Margin="Margin.Is2.FromBottom">
+					<FieldLabel RequiredIndicator>
+						Produktnamn
+					</FieldLabel>
+					<FieldBody>
+						<InputText @bind-Value="ProductToUpdate.Name" class="form-control" />
+						<ValidationMessage For="() => ProductToUpdate.Name"></ValidationMessage>
+					</FieldBody>
+				</Div>
+
+				<Field ColumnSize="ColumnSize.IsFull.OnTablet.IsHalf.OnDesktop">
+					<FieldLabel>
+						Enhet
+					</FieldLabel>
+					<Select TValue="Unit" @bind-SelectedValue="@ProductToUpdate.Unit">
+						@foreach (var enumValue in Enum.GetValues<Unit>())
+						{
+							<SelectItem @key="enumValue" Value="@enumValue">@enumValue</SelectItem>
+						}
+					</Select>
+				</Field>
+
+				<Div Margin="Margin.Is2.FromBottom">
+					<FieldLabel>
+						Förpackningsstorlek
+					</FieldLabel>
+					<FieldBody>
+						<InputNumber @bind-Value="ProductToUpdate.PackageSize" class="form-control" />
+						<ValidationMessage For="() => ProductToUpdate.PackageSize"></ValidationMessage>
+					</FieldBody>
+				</Div>
+
+				<Div Margin="Margin.Is2.FromBottom">
+					<FieldLabel>
+						Antal på lager
+					</FieldLabel>
+					<FieldBody>
+						<InputNumber @bind-Value="ProductToUpdate.Quantity" class="form-control" />
+						<ValidationMessage For="() => ProductToUpdate.Quantity"></ValidationMessage>
+					</FieldBody>
+				</Div>
+
+				<Div Margin="Margin.Is2.FromBottom">
+					<FieldLabel>
+						Minsta lagernivå
+					</FieldLabel>
+					<FieldBody>
+						<InputNumber @bind-Value="ProductToUpdate.MinStockLevel" class="form-control" />
+						<ValidationMessage For="() => ProductToUpdate.MinStockLevel"></ValidationMessage>
+					</FieldBody>
+				</Div>
+
+				<Div Margin="Margin.Is2.FromBottom">
+					<FieldLabel>
+						Senast uppdaterad
+					</FieldLabel>
+					<FieldBody>
+						<InputDate @bind-Value="ProductToUpdate.LastUpdated" class="form-control" />
+						<ValidationMessage For="() => ProductToUpdate.LastUpdated"></ValidationMessage>
+					</FieldBody>
+				</Div>
+
+				<Div>
+					<Button Type="ButtonType.Submit" Color="Color.Primary">Uppdatera produkt</Button>
+					<button class="btn btn-primary" type="button" @onclick="NavigateToOverview">Tillbaka</button>
+				</Div>
+			</EditForm>
+		</CardBody>
+	</Card>
+
+</Div>
+
+@code {
+
+	private ProductDto ProductToUpdate { get; set; } = new();
+	private List<ProductDto> ProductDtoList { get; set; } = [];
+	[Parameter] public int ProductId { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		ProductDtoList.AddRange(await ProductService.GetAllAsync());
+
+		ProductToUpdate = ProductDtoList.FirstOrDefault(p => p.Id == ProductId);
+	}
+
+	private async Task UpdateProduct(int id)
+	{
+		ProductToUpdate.Id = id;
+		await ProductService.UpdateAsync(ProductToUpdate, ProductToUpdate.Id);
+
+		ProductDtoList.Clear();
+		ProductDtoList.AddRange(await ProductService.GetAllAsync());
+	}
+	private void NavigateToOverview()
+	{
+		NavigationManager.NavigateTo("/products");
+	}
+
+}

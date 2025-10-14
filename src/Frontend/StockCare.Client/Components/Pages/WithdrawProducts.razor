@@ -1,4 +1,4 @@
-﻿@page "/withdrawProducts"
+﻿@page "/withdrawProducts/{ProductId:int}"
 @using StockCare.Client.ServiceInterfaces
 @using StockCare.DTOs.DTOs.Product
 @rendermode InteractiveServer
@@ -62,10 +62,13 @@
 	private List<ProductDto> ProductDtoList { get; set; } = [];
 	private int WithdrawalQuantity { get; set; }
 	private bool TooLowStockLevel { get; set; }
+	[Parameter] public int ProductId { get; set; }
 
 	protected override async Task OnInitializedAsync()
 	{
+		ProductDtoList.AddRange(await ProductService.GetAllAsync());
 
+		ProductToUpdate = ProductDtoList.FirstOrDefault(p => p.Id == ProductId);
 
 		await base.OnInitializedAsync();
 	}
